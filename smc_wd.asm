@@ -1,5 +1,5 @@
-;History:500,1
-version	equ	7
+;History:133,1
+version	equ	8
 
 	include	defs.asm
 
@@ -33,6 +33,7 @@ code	segment	byte public
 EN_CMD		equ	000h	; Board's command register
 EN_REG1		equ	001h	; 8013 bus size register
 EN_REG5		equ	005h	; New command register (REGISTER 5)
+EN_REG6		equ	006h	; Ultra interrupt control register
 EN_SAPROM	equ	008h	; Window on station addr prom
 EN_REGE		equ	00eh	; Board Id (code) byte
 
@@ -57,6 +58,9 @@ ENR5_LAN16EN	equ	040h	; Enable 16 bit memory access from chip (8013)
 ENR5_MEM_MASK	equ	01fh	; B23-B19 of address of the memory (8013)
 ENR5_LA19	equ	001h	; B19 of address of the memory (8013)
 ENR5_EIL	equ	004h	; Enable 8390 interrupts to bus (microchannel)
+
+; Commands for REG6 register
+ENR6_EIL	equ	001h	; Enable 8390 interrupts to bus (Ultra)
 
 ; Bits in the REGE register
 ENRE_MICROCHANEL equ	080h	; Microchannel bus (vs. PC/AT)
@@ -125,6 +129,9 @@ reset_8390	macro
 	jz	reset_no_mc
 	out	dx,al			; enable 8390 interrupts to bus
 reset_no_mc:
+	setport	EN_REG6
+	mov	al,ENR6_EIL
+	out	dx,al
 	endm
 
 

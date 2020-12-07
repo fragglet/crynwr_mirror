@@ -1,4 +1,4 @@
-lance_version	equ	1
+lance_version	equ	3
 
 ; Copyright, 1990-1992, Russell Nelson, Crynwr Software
 
@@ -379,6 +379,12 @@ terminate_16:
 	out	DMA_16MASK_REG,al
 terminate_done:
 
+	push	ds			;restore their interrupt 9 (keyboard).
+	lds	dx,their_9
+	mov	ax,2519h
+	int	21h
+	pop	ds
+
 	push	ds			;restore their interrupt 19 (reboot).
 	lds	dx,their_19
 	mov	ax,2519h
@@ -650,15 +656,16 @@ etopen_1:
 	ja	dma_16			;  use sixteen bit dma.
 dma_8:
 	or	al,CASCADE_MODE
-	out	DMA_8MODE_REG,al
+	out	DMA_8MODE_REG,al	;set the mode first, then unmask it.
 	and	al,DMA_CHANNEL_FIELD
 	out	DMA_8MASK_REG,al
 	jmp	short dma_done
 dma_16:
-	and	al,DMA_CHANNEL_FIELD
-	out	DMA_16MASK_REG,al
+	and	al,DMA_CHANNEL_FIELD	;set the mode first, then unmask it.
 	or	al,CASCADE_MODE
 	out	DMA_16MODE_REG,al
+	and	al,DMA_CHANNEL_FIELD
+	out	DMA_16MASK_REG,al
 dma_done:
 
 	mov	al, int_no		; Get board's interrupt vector

@@ -1,6 +1,6 @@
 version	equ	0
 
-;History:335,1
+;History:239,1
 
 ;  Copyright 1990-1992, Russell Nelson, Crynwr Software
 
@@ -235,7 +235,8 @@ our_recv_2:
 	repe	cmpsw
 	je	our_recv_save		;yes, display it.
 
-	add	si,cx			;move to source address.
+	add	si,cx			;move to source address.  CX is in
+	add	si,cx			;  words, not bytes, so add it twice.
 	mov	di,offset ether_addr	;is the source our address?
 	mov	cx,EADDR_LEN/2
 	rep	cmpsw
